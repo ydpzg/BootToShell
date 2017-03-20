@@ -26,6 +26,23 @@
         android:layout_height="wrap_content"
         android:text="切换usb" />
 
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="关闭虚拟按键" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="打开虚拟按键" />
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="重新启动" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

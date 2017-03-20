@@ -18,8 +18,11 @@ import static com.dukelight.boottoshell.AdbCommandUtils.getAdbStatus;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button button;
-    Button button2;
+    Button button; // 切换adb wifi
+    Button button2; // 切换adb usb
+    Button button3; // 关闭虚拟按键
+    Button button4; // 打开虚拟按键
+    Button button5; // 重启
     TextView tvAdbStatus;
 
     public final static String PROJECT_PATH = "BootToShell/config";
@@ -36,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
 
         button = (Button) findViewById(R.id.button);
         button2 = (Button) findViewById(R.id.button2);
+        button3 = (Button) findViewById(R.id.button3);
+        button4 = (Button) findViewById(R.id.button4);
+        button5 = (Button) findViewById(R.id.button5);
         tvAdbStatus = (TextView) findViewById(R.id.tv_adb_status);
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 String result = getAdbStatus();
 
-                                if (result.equals("5555")) {
+                                if (result != null && result.equals("5555")) {
                                     toast("adb切换Wifi成功");
                                     updateWifiView();
                                 } else {
@@ -86,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 String result = getAdbStatus();
-                                if (result.equals("-1")) {
+                                if (result != null && result.equals("-1")) {
                                     toast("adb切换usb成功");
                                     updateUsbView();
                                 } else {
@@ -96,6 +102,99 @@ public class MainActivity extends AppCompatActivity {
                         }).start();
                     }
                 }, 500);
+            }
+        });
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!AdbCommandUtils.isBuildPropExist()) {
+                            AdbCommandUtils.runAppendToBuildProp();
+                        }
+                    }
+                }).start();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AdbCommandUtils.runCloseVitualButton();
+                            }
+                        }).start();
+                    }
+                }, 500);
+
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                boolean result = AdbCommandUtils.isVitualButtonClose();
+                                if (!result) {
+                                    toast("关闭虚拟按钮失败，请检查原因");
+                                } else {
+                                    toast("关闭成功！请重新启动以生效应用配置");
+                                }
+                            }
+                        }).start();
+                    }
+                }, 1000);
+            }
+        });
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!AdbCommandUtils.isBuildPropExist()) {
+                            AdbCommandUtils.runAppendToBuildProp();
+                        }
+                    }
+                }).start();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AdbCommandUtils.runOpenVitualButton();
+                            }
+                        }).start();
+                    }
+                }, 500);
+
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                boolean result = AdbCommandUtils.isVitualButtonOpen();
+                                if (!result) {
+                                    toast("打开虚拟按钮失败，请检查原因");
+                                } else {
+                                    toast("打开成功！请重新启动以生效应用配置");
+                                }
+                            }
+                        }).start();
+                    }
+                }, 1000);
+            }
+        });
+        button5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AdbCommandUtils.runReboot();
+                    }
+                }).start();
             }
         });
         initFolder();
