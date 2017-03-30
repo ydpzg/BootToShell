@@ -10,7 +10,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -207,17 +206,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initAdbStatus() {
-        new Thread(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                final String result = AdbCommandUtils.getAdbStatus();
-                if (result.equals("5555")) {
-                    updateWifiView();
-                } else {
-                    updateUsbView();
-                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String result = AdbCommandUtils.getAdbStatus();
+                        if (result != null) {
+                            if (result.equals("5555")) {
+                                updateWifiView();
+                            } else {
+                                updateUsbView();
+                            }
+                        } else {
+                            updateUsbView();
+                        }
+                    }
+                }).start();
             }
-        }).start();
+        }, 500);
+
     }
 
     private void initFolder() {
@@ -232,35 +241,43 @@ public class MainActivity extends AppCompatActivity {
 
         if (!adbToWifi.exists()) {
             createAdbToWifiFile(adbToWifi);
+        } else {
+            if (adbToWifi.isDirectory()) {
+                adbToWifi.delete();
+                createAdbToWifiFile(adbToWifi);
+            }
         }
         if (!adbToUsb.exists()) {
             createAdbToUsbFile(adbToUsb);
+        } else {
+            if (adbToUsb.isDirectory()) {
+                adbToUsb.delete();
+                createAdbToUsbFile(adbToUsb);
+            }
         }
 
     }
 
     private void createAdbToWifiFile(File adbToWifi) {
         try {
-            StringBuffer sb = new StringBuffer();
-//            sb.append("su -c 'setprop service.adb.tcp.port 5555'");
+            StringBuilder sb = new StringBuilder();
+            sb.append("su -c 'setprop service.adb.tcp.port 5555'");
+            sb.append("\n");
+            sb.append("su -c 'stop adbd'");
+            sb.append("\n");
+            sb.append("su -c 'start adbd'");
+            sb.append("\n");
+//            sb.append("su");
 //            sb.append("\n");
-//            sb.append("su -c 'stop adbd'");
+//            sb.append("setprop service.adb.tcp.port 5555");
 //            sb.append("\n");
-//            sb.append("su -c 'start adbd'");
+//            sb.append("stop adbd");
 //            sb.append("\n");
-            sb.append("su");
-            sb.append("\n");
-            sb.append("setprop service.adb.tcp.port 5555");
-            sb.append("\n");
-            sb.append("stop adbd");
-            sb.append("\n");
-            sb.append("start adbd");
-            sb.append("\n");
+//            sb.append("start adbd");
+//            sb.append("\n");
             FileOutputStream fileOutputStream = new FileOutputStream(adbToWifi);
             fileOutputStream.write(sb.toString().getBytes());
             toast("创建adbToWifi成功");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -268,26 +285,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void createAdbToUsbFile(File adbToUsb) {
         try {
-            StringBuffer sb = new StringBuffer();
-//            sb.append("su -c 'setprop service.adb.tcp.port -1'");
+            StringBuilder sb = new StringBuilder();
+            sb.append("su -c 'setprop service.adb.tcp.port -1'");
+            sb.append("\n");
+            sb.append("su -c 'stop adbd'");
+            sb.append("\n");
+            sb.append("su -c 'start adbd'");
+            sb.append("\n");
+//            sb.append("su");
 //            sb.append("\n");
-//            sb.append("su -c 'stop adbd'");
+//            sb.append("setprop service.adb.tcp.port -1");
 //            sb.append("\n");
-//            sb.append("su -c 'start adbd'");
+//            sb.append("stop adbd");
 //            sb.append("\n");
-            sb.append("su");
-            sb.append("\n");
-            sb.append("setprop service.adb.tcp.port -1");
-            sb.append("\n");
-            sb.append("stop adbd");
-            sb.append("\n");
-            sb.append("start adbd");
-            sb.append("\n");
+//            sb.append("start adbd");
+//            sb.append("\n");
             FileOutputStream fileOutputStream = new FileOutputStream(adbToUsb);
             fileOutputStream.write(sb.toString().getBytes());
             toast("创建adbToUsb成功");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -69,6 +69,7 @@ public class CommandExecution {
             os = new DataOutputStream(process.getOutputStream());
             for (String command : commands) {
                 if (command != null) {
+                    System.out.println("command:" + command);
                     os.write(command.getBytes());
                     os.writeBytes(COMMAND_LINE_END);
                     os.flush();
@@ -87,7 +88,7 @@ public class CommandExecution {
             while ((s = errorResult.readLine()) != null) errorMsg.append(s);
             commandResult.successMsg = successMsg.toString();
             commandResult.errorMsg = errorMsg.toString();
-            Log.i(TAG, commandResult.result + " | " + commandResult.successMsg
+            Log.i(TAG, "result=" + commandResult.result + " | " + commandResult.successMsg
                     + " | " + commandResult.errorMsg);
         } catch (IOException e) {
             String errmsg = e.getMessage();

@@ -24,6 +24,7 @@ public class AdbCommandUtils {
      * 切换adb usb
      */
     public static void runToUsb() {
+        System.out.println("runToUsb");
         String[] adbStrings = new String[]{
                 "sh " + Environment.getExternalStorageDirectory() + "/" + MainActivity.PROJECT_PATH + "/" + MainActivity.ADB_TO_USB_FILE
 //                "su -c 'setprop service.adb.tcp.port -1'",
@@ -42,9 +43,13 @@ public class AdbCommandUtils {
                 "getprop | grep service.adb.tcp"
         };
         CommandExecution.CommandResult commandResult = CommandExecution.execCommand(adbStrings, false);
-        int inx = commandResult.successMsg.lastIndexOf("[");
-        if (inx > 0) {
-            return commandResult.successMsg.substring(inx + 1, commandResult.successMsg.length() - 1);
+        if (commandResult.result == 0) {
+            int inx = commandResult.successMsg.lastIndexOf("[");
+            if (inx > 0) {
+                return commandResult.successMsg.substring(inx + 1, commandResult.successMsg.length() - 1);
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
